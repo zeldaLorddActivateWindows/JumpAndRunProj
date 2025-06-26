@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "cGikejYYmVU=",
+  "dgSpecHash": "3cDYtAj2GNs=",
   "success": true,
-  "projectFilePath": "C:\\Users\\PC\\OneDrive - HTL Vöcklabruck\\Desktop\\main\\main.csproj",
+  "projectFilePath": "C:\\Users\\PC\\OneDrive - HTL Vöcklabruck\\Desktop\\PJHQ\\JumpAndRunProj\\main.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\PC\\.nuget\\packages\\raylib-cs\\7.0.1\\raylib-cs.7.0.1.nupkg.sha512"
   ],
