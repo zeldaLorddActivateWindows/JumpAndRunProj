@@ -9,7 +9,7 @@ namespace JumpAndRun
 {
     internal class Player
     {
-        string Name { get; set; } = string.Empty;
+        string Name { get; set; }
         float Score { get; set; } = 0;
         float XVelocity { get; set; } = 10;
         int JumpHeight { get; set; } = 10;
@@ -17,10 +17,9 @@ namespace JumpAndRun
         public bool IsGrounded { get; set; } = false;
         public bool CanDoubleJump { get; set; } = true;
 
-        public Player(string eName, float eScore) 
+        public Player(string eName) 
         {
             eName = Name;
-            eScore = Score;
             
         }
 
