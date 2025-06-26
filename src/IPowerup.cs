@@ -14,18 +14,13 @@ namespace JumpAndRun
         public int Y;
         public Point(int x, int y) { X = x; Y = y; }
     }
-    internal class Powerup
+    internal interface IPowerup
     {
-        Point Position { get; set; }
-        string Name {  get; set; }
-        float DoubleSpeed {  get; set; } 
-        float Dash {  get; set; }
-        bool IsDashing { get; set; } = false;
-
-        public Powerup()
-        {
-
-        }
+        Point Position { get; }
+        string Name { get; }
+        float DoubleSpeed {  get; } 
+        float Dash { get; }
+        bool IsDashing { get; }
 
     }
 }
