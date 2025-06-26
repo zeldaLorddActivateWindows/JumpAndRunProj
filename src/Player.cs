@@ -22,6 +22,7 @@ namespace JumpAndRun
         private float highestY = 400;
         private float coyoteTime = 0f;
         private const float CoyoteTimeLimit = 0.1f;
+        private float scoreMultiplier = 1.0f;
 
         public Player(string playerName)
         {
@@ -39,22 +40,23 @@ namespace JumpAndRun
                 YVelocity = Math.Min(YVelocity + Gravity * deltaTime, MaxFallSpeed);
                 coyoteTime = wasGrounded ? CoyoteTimeLimit : Math.Max(0, coyoteTime - deltaTime);
             }
-            else
-            {
-                coyoteTime = CoyoteTimeLimit;
-            }
-
+            else coyoteTime = CoyoteTimeLimit;
             Position = new Vector2(Position.X, Position.Y + YVelocity * deltaTime);
-
             if (Position.Y < highestY)
             {
                 highestY = Position.Y;
-                Score = Math.Max(0, (GroundLevel - highestY) / 10);
+                Score = Math.Max(0, (GroundLevel - highestY) / 10) * scoreMultiplier;
             }
 
             CheckPlatformCollisions(platforms);
             CheckGroundCollision();
             ClampToScreenBounds();
+        }
+
+        public void ApplyScoreMultiplier(float multiplier)
+        {
+            scoreMultiplier *= multiplier;
+            Score *= multiplier;
         }
 
         private void CheckPlatformCollisions(List<Platform> platforms)
@@ -85,24 +87,12 @@ namespace JumpAndRun
                 CanDoubleJump = true;
             }
         }
-
-        private void ClampToScreenBounds()
-        {
-            Position = Position.X < 0 ? new Vector2(0, Position.Y) :
-                      Position.X > 800 - Width ? new Vector2(800 - Width, Position.Y) : Position;
-        }
-
+        private void ClampToScreenBounds() => Position = Position.X < 0 ? new Vector2(0, Position.Y) : Position.X > 800 - Width ? new Vector2(800 - Width, Position.Y) : Position;
         private void HandleInput(float deltaTime)
         {
-            if (Raylib_cs.Raylib.IsKeyDown(Raylib_cs.KeyboardKey.A) || Raylib_cs.Raylib.IsKeyDown(Raylib_cs.KeyboardKey.Left))
-                Position = new Vector2(Position.X - XVelocity * deltaTime, Position.Y);
-
-            if (Raylib_cs.Raylib.IsKeyDown(Raylib_cs.KeyboardKey.D) || Raylib_cs.Raylib.IsKeyDown(Raylib_cs.KeyboardKey.Right))
-                Position = new Vector2(Position.X + XVelocity * deltaTime, Position.Y);
-
-            if (Raylib_cs.Raylib.IsKeyPressed(Raylib_cs.KeyboardKey.Space) ||
-                Raylib_cs.Raylib.IsKeyPressed(Raylib_cs.KeyboardKey.W) ||
-                Raylib_cs.Raylib.IsKeyPressed(Raylib_cs.KeyboardKey.Up))
+            if (Raylib_cs.Raylib.IsKeyDown(Raylib_cs.KeyboardKey.A) || Raylib_cs.Raylib.IsKeyDown(Raylib_cs.KeyboardKey.Left)) Position = new Vector2(Position.X - XVelocity * deltaTime, Position.Y);
+            if (Raylib_cs.Raylib.IsKeyDown(Raylib_cs.KeyboardKey.D) || Raylib_cs.Raylib.IsKeyDown(Raylib_cs.KeyboardKey.Right)) Position = new Vector2(Position.X + XVelocity * deltaTime, Position.Y);
+            if (Raylib_cs.Raylib.IsKeyPressed(Raylib_cs.KeyboardKey.Space) || Raylib_cs.Raylib.IsKeyPressed(Raylib_cs.KeyboardKey.W) || Raylib_cs.Raylib.IsKeyPressed(Raylib_cs.KeyboardKey.Up))
             {
                 if (IsGrounded || coyoteTime > 0)
                 {

@@ -7,6 +7,7 @@
     {
         private int maxPlatforms = 100;
         private List<Platform> platforms = new List<Platform>();
+        private List<PowerupMultiplier> powerups = new List<PowerupMultiplier>();
         private float lastPlatformY = 400;
         private Random random = new Random();
         public string NAME { get; } = "Jump and Run";
@@ -55,6 +56,7 @@
         private void GenerateInitialPlatforms()
         {
             platforms.Clear();
+            powerups.Clear();
             platforms.Add(new Platform(200, 450, 120));
             platforms.Add(new Platform(400, 380, 100));
             platforms.Add(new Platform(100, 320, 80));
@@ -105,6 +107,15 @@
 
             player.Update(deltaTime, platforms);
             maxPlatforms++;
+
+            foreach (var powerup in powerups)
+            {
+                if (powerup.CheckCollision(player))
+                {
+                    powerup.OnCollision(player);
+                }
+            }
+
             if (player.Position.Y > DEATH_BOUNDARY)
             {
                 isDying = true;
@@ -124,6 +135,7 @@
             if (player.Position.Y < lastValidY - 50)
             {
                 lastValidY = player.Position.Y;
+                CleanupPowerups();
                 CleanupPlatforms();
                 GeneratePlatforms();
             }
@@ -135,6 +147,7 @@
             isDying = false;
             deathTimer = 0f;
             platforms.Clear();
+            powerups.Clear();
             player = new Player("pexlover");
             GenerateInitialPlatforms();
             lastValidY = player.Position.Y;
@@ -149,7 +162,28 @@
                 float newX = random.Next(50, WIDTH - 200);
                 float newWidth = random.Next(80, 150);
                 newX = Math.Max(0, Math.Min(newX, WIDTH - newWidth));
+
+                bool tooFar = true;
+                int attempts = 0;
+                while (tooFar && attempts < 10)
+                {
+                    float minX = Math.Max(0, newX - 200);
+                    float maxX = Math.Min(WIDTH - newWidth, newX + 200);
+                    newX = random.Next((int)minX, (int)maxX);
+
+                    tooFar = platforms.Any(p => Math.Abs(p.X - newX) > 300);
+                    attempts++;
+                }
+
                 platforms.Add(new Platform(newX, newY, newWidth));
+
+                if (random.Next(0, 100) < 15)
+                {
+                    float powerupX = newX + random.Next(0, (int)newWidth - 20);
+                    float powerupY = newY - 25;
+                    powerups.Add(new PowerupMultiplier(powerupX, powerupY));
+                }
+
                 lastPlatformY = newY;
             }
         }
@@ -161,16 +195,24 @@
             if (platforms.Count < maxPlatforms) GeneratePlatforms();
         }
 
+        private void CleanupPowerups()
+        {
+            float cleanupThreshold = Math.Max(player.Position.Y + HEIGHT * 2, lastValidY + HEIGHT * 2);
+            powerups.RemoveAll(powerup => powerup.Position.Y > cleanupThreshold || powerup.IsCollected);
+        }
+
         public void Draw()
         {
             Raylib.BeginDrawing();
             Raylib.ClearBackground(Color.SkyBlue);
-
+            
             if (!isGameOver)
             {
                 Raylib.BeginMode2D(camera);
+                
                 Raylib.DrawRectangle(0, (int)camera.Target.Y + 500, WIDTH, HEIGHT * 2, Color.Green);
                 foreach (Platform platform in platforms) platform.Draw();
+                foreach (PowerupMultiplier powerup in powerups) powerup.Draw();
                 player.Draw();
                 Raylib.EndMode2D();
 
@@ -191,6 +233,7 @@
                 Raylib.DrawText($"Score: {player.Score:F0}", 10, HEIGHT - 50, 16, Color.Red);
                 Raylib.DrawText($"Height: {Math.Max(0, (500 - player.Position.Y)):F0}m", 10, HEIGHT - 30, 12, Color.Black);
                 Raylib.DrawText($"Platforms: {platforms.Count}", 10, HEIGHT - 15, 10, Color.Gray);
+                Raylib.DrawText($"Powerups: {powerups.Count(p => !p.IsCollected)}", 10, HEIGHT - 5, 10, Color.Gold);
             }
             else
             {
