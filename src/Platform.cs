@@ -26,8 +26,8 @@
             return player.Position.X + player.Width > X &&
                    player.Position.X < X + Width &&
                    player.Position.Y + player.Height >= Y &&
-                   player.Position.Y + player.Height <= Y + Height + 5; 
+                   player.Position.Y + player.Height <= Y + Height + 10 &&
+                   player.Position.Y < Y;
         }
     }
 }
-
