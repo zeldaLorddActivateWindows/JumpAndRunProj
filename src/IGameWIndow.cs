@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 
 namespace JumpAndRun
 {
-    internal interface IGameWIndow
+    internal interface IGameWindow
     {
-        public string Name { get; }
-        public int Width { get; }
-        public int Height { get; }
-
+        public string NAME { get; }
+        public int WIDTH { get; }
+        public int HEIGHT { get; }
+        public int FPS { get; }
+        public void Init();
         public void Update();
         public void Exit();
     }
